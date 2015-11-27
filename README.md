@@ -53,7 +53,7 @@ Tool for create and rotate EC2 AMIs and associated snapshots
 
         # From the project root path
         $ sudo cp cron.d/ec2_amis /etc/cron.d
-	$ sudo vi /etc/cron.d/ec2_amis
+        $ sudo vi /etc/cron.d/ec2_amis
 
 ## Execution Method
 
