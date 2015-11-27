@@ -1,0 +1,22 @@
+#
+# Paths Definition
+#
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+BIN_PATH=<path_to_script>
+LOGS_PATH=<path_to_log>
+
+#
+# AMIs Configuration
+#
+AMI_NAME=<amis_name>
+COPIES_NUMBER=<rotation_copies_number>
+
+#
+# Creation of AMIs belonging to the local instance
+#
+0 4 * * *	<user>	${BIN_PATH}/ec2_ami.py --name $AMI_NAME --time create >${LOGS_PATH}/${AMI_NAME}-create.log 2>&1
+
+#
+# Rotation of AMIs generated from the local instance
+#
+5 4 * * *	<user>	${BIN_PATH}/ec2_ami.py --name $AMI_NAME --rotation-copies $COPIES_NUMBER rotate >${LOGS_PATH}/${AMI_NAME}-rotate.log 2>&1
