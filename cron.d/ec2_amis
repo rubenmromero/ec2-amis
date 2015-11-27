@@ -19,4 +19,4 @@ COPIES_NUMBER=<rotation_copies_number>
 #
 # Rotation of AMIs generated from the local instance
 #
-5 4 * * *	<user>	${BIN_PATH}/ec2_ami.py --name $AMI_NAME --rotation-copies $COPIES_NUMBER rotate >${LOGS_PATH}/${AMI_NAME}-rotate.log 2>&1
+5 4 * * *	<user>	${BIN_PATH}/ec2_ami.py --name $AMI_NAME --time --rotation-copies $COPIES_NUMBER rotate >${LOGS_PATH}/${AMI_NAME}-rotate.log 2>&1
