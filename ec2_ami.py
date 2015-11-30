@@ -108,7 +108,7 @@ if (arguments.command == 'create'):
 
 # If the specified action is 'rotate', the following block is executed
 if (arguments.command == 'rotate'):
-   # Get the list of iregistered AMIs which name match the filter_name pattern
+   # Get the list of registered AMIs which name match the filter_name pattern
    describe_ami_command = shlex.split('aws ec2 describe-images --owner self --filters Name=name,Values='+filter_name)
    output, error = subprocess.Popen(describe_ami_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
 
@@ -127,4 +127,4 @@ if (arguments.command == 'rotate'):
       for i in xrange(rotation_copies, len(sorted_images)):
          deregister_ami(sorted_images[i])
    else:
-      print '\nThe number of registered AMIs with "'+filter_name+'" pattern is less or equal than the rotation copies number. No need to deregister any AMIs\n'
+      print '\nThe number of registered AMIs with "'+filter_name+'" name pattern is less or equal than the rotation copies number. No need to deregister any AMIs\n'

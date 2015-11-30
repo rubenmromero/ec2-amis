@@ -86,6 +86,24 @@ Here you are the message you will get if you request help to the `ec2_ami.py` to
     Actions:
       {create,rotate}       Command to be exectuted
 
+## Execution Examples
+
+* Create an AMI with AMI_NAME-AAAA_MM_DD name format from an EC2 instance with "i-12345678" id, executing the `ec2_ami.py` tool from your own workstation and rebooting the instance to create the AMI:
+
+        $ ./ec2_ami.py --name Foo-Test --instance-id i-12345678 --reboot create
+
+* Create an AMI with AMI_NAME-AAAA_MM_DD-HH_MM name format from an EC2 instance with "i-87654321" id, executing the `ec2_ami.py` tool from the own instance:
+
+        $ ./ec2_ami.py --name Bar-Test --time create
+
+* Rotate the existing AMIs registered with "Foo-Test-AAAA_MM_DD" name pattern keeping the last 7 most recent copies:
+
+        $ ./ec2_ami.py --name Foo-Test --rotation-copies 7 rotate
+
+* Rotate the existing AMIs registered with "Bar-Test-AAAA_MM_DD-HH_MM" name pattern keeping the last 20 most recent copies:
+
+        $ ./ec2_ami.py --name Bar-Test --time --rotation-copies 20 rotate
+
 ## Related Links
 
 * [Install the AWS CLI Using Pip](http://docs.aws.amazon.com/cli/latest/userguide/installing.html#install-with-pip)
