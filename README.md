@@ -1,6 +1,6 @@
 # EC2-AMIs
 
-Tool for create and rotate EC2 AMIs and associated snapshots
+Tool for create and rotate EC2 AMIs and associated snapshots.
 
 ## Prerequisites
 
