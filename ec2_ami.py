@@ -15,7 +15,7 @@ instance_id_metadata_url = 'http://169.254.169.254/latest/meta-data/instance-id'
 # Function to parse the input arguments and build the help message
 #
 def arguments_parser():
-   parser = argparse.ArgumentParser(description='Tool for create and rotate EC2 AMIs and associated snapshots', add_help=False)
+   parser = argparse.ArgumentParser(description='Tool to create and rotate EC2 AMIs and associated snapshots', add_help=False)
 
    options = parser.add_argument_group('Options')
    options.add_argument('-h', '--help', action='help', help='Show this help message and exit')
