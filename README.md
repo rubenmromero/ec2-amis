@@ -1,6 +1,6 @@
 # EC2-AMIs
 
-Tool for create and rotate EC2 AMIs and associated snapshots.
+Tool to create and rotate EC2 AMIs and associated snapshots.
 
 ## Prerequisites
 
@@ -64,7 +64,7 @@ Here you are the message you will get if you request help to the `ec2_ami.py` to
                       [-r] [-c COPIES_NUMBER]
                       {create,rotate}
     
-    Tool for create and rotate EC2 AMIs and associated snapshots
+    Tool to create and rotate EC2 AMIs and associated snapshots
     
     Options:
       -h, --help            Show this help message and exit
