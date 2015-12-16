@@ -51,7 +51,7 @@ Tool to create and rotate EC2 AMIs and associated snapshots.
 
 2. If you want to schedule the periodic tool execution, copy the [ec2_amis](cron.d/ec2_amis) template to the `/etc/cron.d` directory and replace the existing `<tags>` with the appropiate values:
 
-        # From the project root path
+        # From the project root folder
         $ sudo cp cron.d/ec2_amis /etc/cron.d
         $ sudo vi /etc/cron.d/ec2_amis
 
