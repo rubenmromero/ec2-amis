@@ -62,30 +62,30 @@ def deregister_ami(ami_info):
 # Parsing of input arguments
 arguments = arguments_parser()
 
-# Definition of necessary parameters for AMIs management
-if arguments.time:
-   actual_date = time.strftime('%Y_%m_%d-%H_%M')
-   filter_date = '????_??_??-??_??'
-else:
-   actual_date = time.strftime('%Y_%m_%d')
-   filter_date = '????_??_??'
-ami_name = arguments.ami_name+'-'+actual_date
-filter_name = arguments.ami_name+'-'+filter_date
-
-if (not arguments.ami_description) or (arguments.ami_description == 'TBD'):
-   ami_description = '"'+arguments.ami_name+' AMI created by '+os.path.basename(sys.argv[0])+'"'
-else:
-   ami_description = '"'+arguments.ami_description+'"'
-
-if (not arguments.instance_id) or (arguments.instance_id == 'TBD'):
-   instance_id = str(requests.get(instance_id_metadata_url).text)
-else:
-   instance_id = arguments.instance_id
-
-rotation_copies = arguments.copies_number
-
 # If the specified action is 'create', the following block is executed
 if (arguments.command == 'create'):
+   # Definition of required parameters to create AMIs
+   if arguments.time:
+      actual_date = time.strftime('%Y_%m_%d-%H_%M')
+   else:
+      actual_date = time.strftime('%Y_%m_%d')
+   ami_name = arguments.ami_name+'-'+actual_date
+
+   if (not arguments.ami_description) or (arguments.ami_description == 'TBD'):
+      ami_description = '"'+arguments.ami_name+' AMI created by '+os.path.basename(sys.argv[0])+'"'
+   else:
+      ami_description = '"'+arguments.ami_description+'"'
+
+   if (not arguments.instance_id) or (arguments.instance_id == 'TBD'):
+      try:
+         instance_id = str(requests.get(instance_id_metadata_url).text)
+      except requests.exceptions.RequestException as err:
+         print '\nThis is not an EC2 instance, so --instance_id option must be specified\n'
+         os.system(__file__+' --help')
+         exit(1)
+   else:
+      instance_id = arguments.instance_id
+
    # Check if already exists any created AMI with ami_name name
    describe_ami_command = shlex.split('aws ec2 describe-images --owner self --filters Name=name,Values='+ami_name)
    output, error = subprocess.Popen(describe_ami_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
@@ -108,6 +108,15 @@ if (arguments.command == 'create'):
 
 # If the specified action is 'rotate', the following block is executed
 if (arguments.command == 'rotate'):
+   # Definition of required parameters to rotate AMIs
+   if arguments.time:
+      filter_date = '????_??_??-??_??'
+   else:
+      filter_date = '????_??_??'
+   filter_name = arguments.ami_name+'-'+filter_date
+
+   rotation_copies = arguments.copies_number
+
    # Get the list of registered AMIs which name match the filter_name pattern
    describe_ami_command = shlex.split('aws ec2 describe-images --owner self --filters Name=name,Values='+filter_name)
    output, error = subprocess.Popen(describe_ami_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
