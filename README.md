@@ -49,11 +49,11 @@ Tool to create and rotate EC2 AMIs and associated snapshots.
 
         $ git clone https://github.com/rubenmromero/ec2-amis.git
 
-2. If you want to schedule the periodic tool execution, copy the [ec2_amis](cron.d/ec2_amis) template to the `/etc/cron.d` directory and replace the existing `<tags>` with the appropiate values:
+2. If you want to schedule the periodic tool execution, copy the [ec2-amis](cron.d/ec2-amis) template to the `/etc/cron.d` directory and replace the existing `<tags>` with the appropiate values:
 
         # From the project root folder
-        $ sudo cp cron.d/ec2_amis /etc/cron.d
-        $ sudo vi /etc/cron.d/ec2_amis
+        $ sudo cp cron.d/ec2-amis /etc/cron.d
+        $ sudo vi /etc/cron.d/ec2-amis
 
 ## Execution Method
 
