@@ -44,7 +44,10 @@ def deregister_ami(ami_info):
    print '\nIt proceeds to deregister "'+image_id+'" AMI with "'+ami_info['Name']+'" name:'
    deregister_ami_command = shlex.split('aws ec2 deregister-image --image-id '+image_id)
    output, error = subprocess.Popen(deregister_ami_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
-   print output
+   if output != '':
+      print output
+   if error != '':
+      print error
 
    # Delete the associated snapshots
    for device in ami_info['BlockDeviceMappings']:
@@ -54,7 +57,10 @@ def deregister_ami(ami_info):
          print '\nIt proceeds to delete "'+snapshot_id+'" associated snapshot:'
          delete_snapshot_command = shlex.split('aws ec2 delete-snapshot --snapshot-id '+snapshot_id)
          output, error = subprocess.Popen(delete_snapshot_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
-         print output
+         if output != '':
+            print output
+         if error != '':
+            print error
 
 #
 # Main
@@ -116,7 +122,10 @@ if (arguments.command == 'create'):
       else:
          create_ami_command = shlex.split('aws ec2 create-image --instance-id '+instance_id+' --name '+ami_name+' --description '+ami_description+' --block-device-mappings \''+block_device_list_json+'\' --no-reboot')
    output, error = subprocess.Popen(create_ami_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
-   print output
+   if output != '':
+      print output
+   if error != '':
+      print error
 
 # If the specified action is 'rotate', the following block is executed
 if (arguments.command == 'rotate'):
