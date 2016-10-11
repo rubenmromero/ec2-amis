@@ -105,14 +105,14 @@ if (arguments.command == 'create'):
       deregister_ami(result['Images'][0])
 
    print '\nCreation of "'+ami_name+'" AMI with',ami_description,'description from "'+instance_id+'" instance:'
-   if arguments.reboot:
-      if block_device_list_json is None:
+   if block_device_list_json is None:
+      if arguments.reboot:
          create_ami_command = shlex.split('aws ec2 create-image --instance-id '+instance_id+' --name '+ami_name+' --description '+ami_description)
       else:
-         create_ami_command = shlex.split('aws ec2 create-image --instance-id '+instance_id+' --name '+ami_name+' --description '+ami_description+' --block-device-mappings \''+block_device_list_json+'\'')
-   else:
-      if block_device_list_json is None:
          create_ami_command = shlex.split('aws ec2 create-image --instance-id '+instance_id+' --name '+ami_name+' --description '+ami_description+' --no-reboot')
+   else:
+      if arguments.reboot:
+         create_ami_command = shlex.split('aws ec2 create-image --instance-id '+instance_id+' --name '+ami_name+' --description '+ami_description+' --block-device-mappings \''+block_device_list_json+'\'')
       else:
          create_ami_command = shlex.split('aws ec2 create-image --instance-id '+instance_id+' --name '+ami_name+' --description '+ami_description+' --block-device-mappings \''+block_device_list_json+'\' --no-reboot')
    output, error = subprocess.Popen(create_ami_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
