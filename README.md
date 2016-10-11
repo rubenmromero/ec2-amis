@@ -61,7 +61,7 @@ Here you are the message you will get if you request help to the `ec2_ami.py` to
 
     $ ./ec2_ami.py --help
     usage: ec2_ami.py [-h] -n AMI_NAME [-t] [-d AMI_DESCRIPTION] [-i INSTANCE_ID]
-                      [-r] [-c COPIES_NUMBER]
+                      [-r] [-b BLOCK_DEVICE_LIST_JSON] [-c COPIES_NUMBER]
                       {create,rotate}
     
     Tool to create and rotate EC2 AMIs and associated snapshots
@@ -80,6 +80,10 @@ Here you are the message you will get if you request help to the `ec2_ami.py` to
                             Instance ID)
       -r, --reboot          Reboot the instance to create the AMI (default: No
                             reboot)
+      -b BLOCK_DEVICE_LIST_JSON, --block-device-mappings BLOCK_DEVICE_LIST_JSON
+                            JSON format list of one or more block device mappings
+                            to include in the AMI (default: Include all block
+                            device mappings attached to the instance)
       -c COPIES_NUMBER, --rotation-copies COPIES_NUMBER
                             Number of copies for rotation (default: 10)
     
