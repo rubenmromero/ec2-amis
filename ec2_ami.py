@@ -24,6 +24,7 @@ def arguments_parser():
    options.add_argument('-d', '--description', type=str, action='store', dest='ami_description', default='TBD', help='Description for the AMI to create (default: AMI_NAME AMI created by '+os.path.basename(sys.argv[0])+')')
    options.add_argument('-i', '--instance-id', type=str, action='store', dest='instance_id', default='TBD', help='Instance ID from which create the AMI (default: Self Instance ID)')
    options.add_argument('-r', '--reboot', action='store_true', dest='reboot', help='Reboot the instance to create the AMI (default: No reboot)')
+   options.add_argument('-b', '--block-device-mappings', type=str, action='store', dest='block_device_list_json', default='TBD', help='JSON format list of one or more block device mappings to include in the AMI (default: Include all block device mappings attached to the instance)')
    options.add_argument('-c', '--rotation-copies', type=int, action='store', dest='copies_number', default=10, help='Number of copies for rotation (default: 10)')
 
    commands = parser.add_argument_group('Actions')
@@ -86,6 +87,11 @@ if (arguments.command == 'create'):
    else:
       instance_id = arguments.instance_id
 
+   if (not arguments.block_device_list_json) or (arguments.block_device_list_json == 'TBD'):
+      block_device_list_json = None
+   else:
+      block_device_list_json = arguments.block_device_list_json
+
    # Check if already exists any created AMI with ami_name name
    describe_ami_command = shlex.split('aws ec2 describe-images --owner self --filters Name=name,Values='+ami_name)
    output, error = subprocess.Popen(describe_ami_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
@@ -100,9 +106,15 @@ if (arguments.command == 'create'):
 
    print '\nCreation of "'+ami_name+'" AMI with',ami_description,'description from "'+instance_id+'" instance:'
    if arguments.reboot:
-      create_ami_command = shlex.split('aws ec2 create-image --instance-id '+instance_id+' --name '+ami_name+' --description '+ami_description)
+      if block_device_list_json is None:
+         create_ami_command = shlex.split('aws ec2 create-image --instance-id '+instance_id+' --name '+ami_name+' --description '+ami_description)
+      else:
+         create_ami_command = shlex.split('aws ec2 create-image --instance-id '+instance_id+' --name '+ami_name+' --description '+ami_description+' --block-device-mappings \''+block_device_list_json+'\'')
    else:
-      create_ami_command = shlex.split('aws ec2 create-image --instance-id '+instance_id+' --name '+ami_name+' --description '+ami_description+' --no-reboot')
+      if block_device_list_json is None:
+         create_ami_command = shlex.split('aws ec2 create-image --instance-id '+instance_id+' --name '+ami_name+' --description '+ami_description+' --no-reboot')
+      else:
+         create_ami_command = shlex.split('aws ec2 create-image --instance-id '+instance_id+' --name '+ami_name+' --description '+ami_description+' --block-device-mappings \''+block_device_list_json+'\' --no-reboot')
    output, error = subprocess.Popen(create_ami_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
    print output
 
