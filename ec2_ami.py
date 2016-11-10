@@ -146,7 +146,7 @@ if (arguments.command == 'rotate'):
     result = json.loads(output)
 
     # Sort the AMIs list by the 'Name' attribute
-    sorted_images = sorted(result['Images'], key=itemgetter('Name'), reverse=True) 
+    sorted_images = sorted(result['Images'], key=itemgetter('Name'), reverse=True)
 
     print '\nAMIs currently registered:\n'
     for ami in sorted_images:
