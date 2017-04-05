@@ -103,7 +103,11 @@ if (arguments.command == 'create'):
     output, error = subprocess.Popen(describe_ami_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
 
     # Decoding of JSON response
-    result = json.loads(output)
+    try:
+        result = json.loads(output)
+    except ValueError as err:
+        print error
+        exit(255)
 
     # If already exists a created AMI with ami_name name, it proceeds to deregister in order to create it again
     if (result['Images']) and (result['Images'][0]['Name'] == ami_name):
@@ -143,7 +147,11 @@ if (arguments.command == 'rotate'):
     output, error = subprocess.Popen(describe_ami_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
 
     # Decoding of JSON response
-    result = json.loads(output)
+    try:
+        result = json.loads(output)
+    except ValueError as err:
+        print error
+        exit(255)
 
     # Sort the AMIs list by the 'Name' attribute
     sorted_images = sorted(result['Images'], key=itemgetter('Name'), reverse=True)
