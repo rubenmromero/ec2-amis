@@ -6,54 +6,54 @@ Tool to create and rotate EC2 AMIs and associated snapshots.
 
 * Pip tool for Python packages management. Installation:
 
-        $ curl -O https://bootstrap.pypa.io/get-pip.py
-        $ sudo python get-pip.py
+      $ curl -O https://bootstrap.pypa.io/get-pip.py
+      $ sudo python get-pip.py
 
 * AWS IAM EC2 Role (only for executions from EC2 instances) or IAM User with the following associated IAM policy:
 
-        Policy Name : EC2-ManageAMIs-<YYYYMMDD>
+      Policy Name : EC2-ManageAMIs-<YYYYMMDD>
         
-        {
-            "Version": "2012-10-17",
-            "Statement": [
-                {
-                    "Sid": "Stmt1430150596000",
-                    "Effect": "Allow",
-                    "Action": [
-                        "ec2:CreateImage",
-                        "ec2:DeleteSnapshot",
-                        "ec2:DeregisterImage",
-                        "ec2:DescribeImageAttribute",
-                        "ec2:DescribeImages"
-                    ],
-                    "Resource": [
-                        "*"
-                    ]
-                }
-            ]
-        }
+      {
+          "Version": "2012-10-17",
+          "Statement": [
+              {
+                  "Sid": "Stmt1430150596000",
+                  "Effect": "Allow",
+                  "Action": [
+                      "ec2:CreateImage",
+                      "ec2:DeleteSnapshot",
+                      "ec2:DeregisterImage",
+                      "ec2:DescribeImageAttribute",
+                      "ec2:DescribeImages"
+                  ],
+                  "Resource": [
+                      "*"
+                  ]
+              }
+          ]
+      }
 
 * AWS CLI for ec2 commands. Installation and configuration:
 
-        $ sudo pip install awscli
+      $ sudo pip install awscli
 
-        $ aws configure
-        AWS Access Key ID [None]: <access_key>		# Leave blank in EC2 instances with associated IAM Role
-        AWS Secret Access Key [None]: <secret_key>	# Leave blank in EC2 instances with associated IAM Role
-        Default region name [None]: eu-west-1
-        Default output format [None]:
+      $ aws configure
+      AWS Access Key ID [None]: <access_key>		# Leave blank in EC2 instances with associated IAM Role
+      AWS Secret Access Key [None]: <secret_key>	# Leave blank in EC2 instances with associated IAM Role
+      Default region name [None]: eu-west-1
+      Default output format [None]:
 
 ## Configuration
 
 1. Download the project code in your favourite path:
 
-        $ git clone https://github.com/rubenmromero/ec2-amis.git
+       $ git clone https://github.com/rubenmromero/ec2-amis.git
 
 2. If you want to schedule the periodic tool execution, copy the [ec2-amis](cron.d/ec2-amis) template to the `/etc/cron.d` directory and replace the existing `<tags>` with the appropiate values:
 
-        # From the project root folder
-        $ sudo cp cron.d/ec2-amis /etc/cron.d
-        $ sudo vi /etc/cron.d/ec2-amis
+       # From the project root folder
+       $ sudo cp cron.d/ec2-amis /etc/cron.d
+       $ sudo vi /etc/cron.d/ec2-amis
 
 ## Execution Method
 
@@ -94,19 +94,19 @@ Here you are the message you will get if you request help to the `ec2_ami.py` to
 
 * Create an AMI with AMI_NAME-AAAA_MM_DD name format from an EC2 instance with "i-12345678" id, executing the `ec2_ami.py` tool from your own workstation and rebooting the instance to create the AMI:
 
-        $ ./ec2_ami.py --name Foo-Test --instance-id i-12345678 --reboot create
+      $ ./ec2_ami.py --name Foo-Test --instance-id i-12345678 --reboot create
 
 * Create an AMI with AMI_NAME-AAAA_MM_DD-HH_MM name format from an EC2 instance with "i-87654321" id, executing the `ec2_ami.py` tool from the own instance:
 
-        $ ./ec2_ami.py --name Bar-Test --time create
+      $ ./ec2_ami.py --name Bar-Test --time create
 
 * Rotate the existing AMIs registered with "Foo-Test-AAAA_MM_DD" name pattern keeping the last 7 most recent copies:
 
-        $ ./ec2_ami.py --name Foo-Test --rotation-copies 7 rotate
+      $ ./ec2_ami.py --name Foo-Test --rotation-copies 7 rotate
 
 * Rotate the existing AMIs registered with "Bar-Test-AAAA_MM_DD-HH_MM" name pattern keeping the last 20 most recent copies:
 
-        $ ./ec2_ami.py --name Bar-Test --time --rotation-copies 20 rotate
+      $ ./ec2_ami.py --name Bar-Test --time --rotation-copies 20 rotate
 
 ## Related Links
 
