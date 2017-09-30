@@ -57,7 +57,7 @@ Tool to create and rotate EC2 AMIs and associated snapshots.
 
 ## Execution Method
 
-Here you are the message you will get if you request help to the `ec2_ami.py` tool:
+Here you have the message that you will get if you request help to the `ec2_ami.py` tool:
 
     $ ./ec2_ami.py --help
     usage: ec2_ami.py [-h] -n AMI_NAME [-t] [-d AMI_DESCRIPTION] [-i INSTANCE_ID]
