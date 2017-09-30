@@ -88,7 +88,7 @@ if (arguments.command == 'create'):
 
     if (not arguments.instance_id) or (arguments.instance_id == 'TBD'):
         try:
-            instance_id = str(requests.get(instance_id_metadata_url).text)
+            instance_id = str(requests.get(instance_id_metadata_url, timeout=3).text)
         except requests.exceptions.RequestException as err:
             print "\nThis is not an EC2 instance, so --instance_id option must be specified\n"
             os.system(__file__ + ' --help')
