@@ -34,7 +34,7 @@ def arguments_parser():
     return args
 
 #
-# Function to print result of system commands executions
+# Function to print the result of system commands executions
 #
 def printResult(output, error):
     if output != '':
