@@ -4,15 +4,10 @@ Tool to create and rotate EC2 AMIs and associated snapshots.
 
 ## Prerequisites
 
-* Pip tool for Python packages management. Installation:
-
-      $ curl -O https://bootstrap.pypa.io/get-pip.py
-      $ sudo python get-pip.py
-
 * AWS IAM EC2 Role (only for executions from EC2 instances) or IAM User with the following associated IAM policy:
 
       Policy Name : EC2-ManageAMIs-<YYYYMMDD>
-        
+
       {
           "Version": "2012-10-17",
           "Statement": [
@@ -33,6 +28,11 @@ Tool to create and rotate EC2 AMIs and associated snapshots.
           ]
       }
 
+* Pip tool for Python packages management. Installation:
+
+      $ curl -O https://bootstrap.pypa.io/get-pip.py
+      $ sudo python get-pip.py
+
 * AWS CLI for ec2 commands. Installation and configuration:
 
       $ sudo pip install awscli
@@ -42,6 +42,10 @@ Tool to create and rotate EC2 AMIs and associated snapshots.
       AWS Secret Access Key [None]: <secret_key>	# Leave blank in EC2 instances with associated IAM Role
       Default region name [None]: eu-west-1
       Default output format [None]:
+
+* Requests module for Python. Installation:
+
+      $ sudo pip install requests
 
 ## Configuration
 
@@ -63,9 +67,9 @@ Here you have the message that you will get if you request help to the `ec2_ami.
     usage: ec2_ami.py [-h] -n AMI_NAME [-t] [-d AMI_DESCRIPTION] [-i INSTANCE_ID]
                       [-r] [-b BLOCK_DEVICE_LIST_JSON] [-c COPIES_NUMBER]
                       {create,rotate}
-    
+
     Tool to create and rotate EC2 AMIs and associated snapshots
-    
+
     Options:
       -h, --help            Show this help message and exit
       -n AMI_NAME, --name AMI_NAME
@@ -86,7 +90,7 @@ Here you have the message that you will get if you request help to the `ec2_ami.
                             device mappings attached to the instance)
       -c COPIES_NUMBER, --rotation-copies COPIES_NUMBER
                             Number of copies for rotation (default: 10)
-    
+
     Actions:
       {create,rotate}       Command to be exectuted
 
