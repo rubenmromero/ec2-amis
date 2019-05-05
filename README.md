@@ -70,8 +70,10 @@ Here you have the message that you will get if you request help to the `ec2_ami.
 
     Tool to create and rotate EC2 AMIs and associated snapshots
 
+    optional arguments:
+      -h, --help            show this help message and exit
+
     Options:
-      -h, --help            Show this help message and exit
       -n AMI_NAME, --name AMI_NAME
                             Name for the AMI to create or rotate
       -t, --time            Add the time to the name format: AMI_NAME-AAAA_MM_DD-

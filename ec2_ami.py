@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 #
 # Modules Import
@@ -15,10 +15,9 @@ instance_id_metadata_url = 'http://169.254.169.254/latest/meta-data/instance-id'
 # Function to parse the input arguments and build the help message
 #
 def arguments_parser():
-    parser = argparse.ArgumentParser(description='Tool to create and rotate EC2 AMIs and associated snapshots', add_help=False)
+    parser = argparse.ArgumentParser(description='Tool to create and rotate EC2 AMIs and associated snapshots', add_help=True)
 
     options = parser.add_argument_group('Options')
-    options.add_argument('-h', '--help', action='help', help='Show this help message and exit')
     options.add_argument('-n', '--name', type=str, action='store', dest='ami_name', required=True, help='Name for the AMI to create or rotate')
     options.add_argument('-t', '--time', action='store_true', dest='time', help='Add the time to the name format: AMI_NAME-AAAA_MM_DD-HH_MM (default: AMI_NAME-AAAA_MM_DD)')
     options.add_argument('-d', '--description', type=str, action='store', dest='ami_description', default='TBD', help='Description for the AMI to create (default: AMI_NAME AMI created by ' + os.path.basename(sys.argv[0]) + ')')
@@ -36,7 +35,7 @@ def arguments_parser():
 #
 # Function to print the result of system commands executions
 #
-def printResult(output, error):
+def print_result(output, error):
     if output != '':
         print output
     if error != '':
@@ -53,7 +52,7 @@ def deregister_ami(ami_info):
     print "\nIt proceeds to deregister '" + image_id + "' AMI with '" + ami_info['Name'] + "' name:"
     deregister_ami_command = shlex.split('aws ec2 deregister-image --image-id ' + image_id)
     output, error = subprocess.Popen(deregister_ami_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
-    printResult(output, error)
+    print_result(output, error)
 
     # Delete the associated snapshots
     for device in ami_info['BlockDeviceMappings']:
@@ -63,7 +62,7 @@ def deregister_ami(ami_info):
             print "\nIt proceeds to delete '" + snapshot_id + "' associated snapshot:"
             delete_snapshot_command = shlex.split('aws ec2 delete-snapshot --snapshot-id ' + snapshot_id)
             output, error = subprocess.Popen(delete_snapshot_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
-            printResult(output, error)
+            print_result(output, error)
 
 #
 # Main
@@ -130,7 +129,7 @@ if (arguments.command == 'create'):
         else:
             create_ami_command = shlex.split('aws ec2 create-image --instance-id ' + instance_id + ' --name ' + ami_name + ' --description ' + ami_description + ' --block-device-mappings \'' + block_device_list_json + '\' --no-reboot')
     output, error = subprocess.Popen(create_ami_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
-    printResult(output, error)
+    print_result(output, error)
 
 # If the specified action is 'rotate', the following block is executed
 if (arguments.command == 'rotate'):
