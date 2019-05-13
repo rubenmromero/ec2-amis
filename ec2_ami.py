@@ -195,7 +195,14 @@ if (arguments.command == 'rotate'):
             print("\nThere is " + str(len(sorted_images) - rotation_copies) + " AMI to deregister...")
         else:
             print("\nThere are " + str(len(sorted_images) - rotation_copies) + " AMIs to deregister...")
-        for i in xrange(rotation_copies, len(sorted_images)):
+
+        try:
+            # Python 2 forward compatibility
+            range = xrange
+        except NameError:
+            pass
+
+        for i in range(rotation_copies, len(sorted_images)):
             deregister_ami(sorted_images[i])
     else:
         print("\nThe number of registered AMIs with '" + filter_name + "' name pattern is less or equal than the rotation copies number. No need to deregister any AMIs\n")
