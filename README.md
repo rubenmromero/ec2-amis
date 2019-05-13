@@ -114,6 +114,14 @@ Here you have the message that you will get if you request help to the `ec2_ami.
 
       $ ./ec2_ami.py --name Bar-Test --time create
 
+* Create an AMI with AMI_NAME-AAAA_MM_DD-HH_MM name format from an EC2 instance with "i-12345678" id, executing the `ec2_ami.py` tool from your own workstation and including only the root device with several properties customized in the block device mapping of the AMI:
+
+      $ ./ec2_ami.py --name Foo-Test --time --instance-id i-12345678 --block-device-mappings '[{"DeviceName":"/dev/xvda","Ebs":{"VolumeType":"gp2","DeleteOnTermination":true}}]' create
+
+* Create an AMI with AMI_NAME-AAAA_MM_DD name format from an EC2 instance with "i-87654321" id, executing the `ec2_ami.py` tool from the own instance and suppressing the `/dev/sdf` device included in the block device mapping of the AMI:
+
+      $ ./ec2_ami.py --name Bar-Test --block-device-mappings '[{"DeviceName":"/dev/sdf","NoDevice":""}]' create
+
 * Rotate the existing AMIs registered with "Foo-Test-AAAA_MM_DD" name pattern keeping the last 7 most recent copies:
 
       $ ./ec2_ami.py --name Foo-Test --rotation-copies 7 rotate

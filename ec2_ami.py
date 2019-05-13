@@ -114,7 +114,7 @@ if (arguments.command == 'create'):
     if (not arguments.block_device_list_json) or (arguments.block_device_list_json == 'TBD'):
         block_device_list_json = None
     else:
-        block_device_list_json = arguments.block_device_list_json
+        block_device_list_json = json.loads(arguments.block_device_list_json)
 
     # Check if already exists any created AMI with ami_name name
     response = ec2.describe_images(
