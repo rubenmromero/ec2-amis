@@ -162,7 +162,10 @@ if (arguments.command == 'rotate'):
         print "\t" + ami['Name']
 
     if (len(sorted_images) > rotation_copies):
-        print "\nThere are",len(sorted_images) - rotation_copies,"AMIs to deregister..."
+        if (len(sorted_images) - rotation_copies) == 1:
+            print "\nThere is",len(sorted_images) - rotation_copies,"AMI to deregister..."
+        else:
+            print "\nThere are",len(sorted_images) - rotation_copies,"AMIs to deregister..."
         for i in xrange(rotation_copies, len(sorted_images)):
             deregister_ami(sorted_images[i])
     else:
