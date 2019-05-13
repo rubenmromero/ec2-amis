@@ -3,7 +3,7 @@
 #
 # Modules Import
 #
-import sys, os, argparse, time, subprocess, shlex, json, requests
+import argparse, boto3, json, os, requests, sys, time
 from operator import itemgetter
 
 #
@@ -25,6 +25,7 @@ def arguments_parser():
     options.add_argument('-r', '--reboot', action='store_true', dest='reboot', help='Reboot the instance to create the AMI (default: No reboot)')
     options.add_argument('-b', '--block-device-mappings', type=str, action='store', dest='block_device_list_json', default='TBD', help='JSON format list of one or more block device mappings to include in the AMI (default: Include all block device mappings attached to the instance)')
     options.add_argument('-c', '--rotation-copies', type=int, action='store', dest='copies_number', default=10, help='Number of copies for rotation (default: 10)')
+    options.add_argument('-p', '--profile', type=str, action='store', dest='profile', default='default', help='Use a specific profile from AWS CLI stored configurations')
 
     commands = parser.add_argument_group('Actions')
     commands.add_argument('command', type=str, choices=['create', 'rotate'], help='Command to be exectuted')
@@ -33,13 +34,27 @@ def arguments_parser():
     return args
 
 #
-# Function to print the result of system commands executions
+# Function to print the boto3 responses in JSON format
 #
-def print_result(output, error):
-    if output != '':
-        print output
-    if error != '':
-        print error
+def print_response(response):
+    print(json.dumps(response, default=str, sort_keys=True, indent=4, separators=(',', ': ')))
+
+#
+# Function to create a session of boto3 to interact with the AWS account
+#
+def create_session():
+    profile = arguments.profile
+    if (profile != 'default') and (not profile in boto3.session.Session().available_profiles):
+        print("\nThe '" + profile + "' profile does not exist!\n")
+    elif (profile == 'default') and (boto3.session.Session().get_credentials() is None):
+        print("\nThere is no AWS CLI configuration defined!\n")
+    elif profile != 'default':
+        return boto3.session.Session(profile_name=profile)
+    else:
+        return boto3.session.Session()
+
+    print("Please provide AWS configuration, e.g. via the AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY and AWS_DEFAULT_REGION environment variables\n")
+    exit(-1)
 
 #
 # Function to deregister an AMI and delete its associated snapshots
@@ -49,27 +64,28 @@ def print_result(output, error):
 def deregister_ami(ami_info):
     # Deregister the AMI
     image_id = str(ami_info['ImageId'])
-    print "\nIt proceeds to deregister '" + image_id + "' AMI with '" + ami_info['Name'] + "' name:"
-    deregister_ami_command = shlex.split('aws ec2 deregister-image --image-id ' + image_id)
-    output, error = subprocess.Popen(deregister_ami_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
-    print_result(output, error)
+    print("\nIt proceeds to deregister '" + image_id + "' AMI with '" + ami_info['Name'] + "' name:")
+    response = ec2.deregister_image(ImageId=image_id)
+    print_response(response)
 
     # Delete the associated snapshots
     for device in ami_info['BlockDeviceMappings']:
         # If device is an EBS volume, it proceeds to delete the associated snapshot
         if 'Ebs' in device:
             snapshot_id = str(device['Ebs']['SnapshotId'])
-            print "\nIt proceeds to delete '" + snapshot_id + "' associated snapshot:"
-            delete_snapshot_command = shlex.split('aws ec2 delete-snapshot --snapshot-id ' + snapshot_id)
-            output, error = subprocess.Popen(delete_snapshot_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
-            print_result(output, error)
+            print("\nIt proceeds to delete '" + snapshot_id + "' associated snapshot:")
+            response = ec2.delete_snapshot(SnapshotId=snapshot_id)
+            print_response(response)
 
 #
 # Main
 #
 
-# Parsing of input arguments
+# Parse input arguments
 arguments = arguments_parser()
+
+session = create_session()
+ec2 = session.client('ec2')
 
 # If the specified action is 'create', the following block is executed
 if (arguments.command == 'create'):
@@ -81,15 +97,15 @@ if (arguments.command == 'create'):
     ami_name = arguments.ami_name + '-' + actual_date
 
     if (not arguments.ami_description) or (arguments.ami_description == 'TBD'):
-        ami_description = "'" + arguments.ami_name + " AMI created by " + os.path.basename(sys.argv[0]) + "'"
+        ami_description = arguments.ami_name + ' AMI created by ' + os.path.basename(sys.argv[0])
     else:
-        ami_description = "'" + arguments.ami_description + "'"
+        ami_description = arguments.ami_description
 
     if (not arguments.instance_id) or (arguments.instance_id == 'TBD'):
         try:
             instance_id = str(requests.get(instance_id_metadata_url, timeout=3).text)
         except requests.exceptions.RequestException as err:
-            print "\nThis is not an EC2 instance, so --instance_id option must be specified\n"
+            print("\nThis is not an EC2 instance, so --instance_id option must be specified\n")
             os.system(__file__ + ' --help')
             exit(1)
     else:
@@ -98,38 +114,54 @@ if (arguments.command == 'create'):
     if (not arguments.block_device_list_json) or (arguments.block_device_list_json == 'TBD'):
         block_device_list_json = None
     else:
-        block_device_list_json = arguments.block_device_list_json
+        block_device_list_json = json.loads(arguments.block_device_list_json)
 
     # Check if already exists any created AMI with ami_name name
-    describe_ami_command = shlex.split('aws ec2 describe-images --owner self --filters Name=name,Values=' + ami_name)
-    output, error = subprocess.Popen(describe_ami_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
-
-    # Decoding of JSON response
-    try:
-        result = json.loads(output)
-    except ValueError as err:
-        print output
-        print err
-        exit(255)
+    response = ec2.describe_images(
+        Filters=[{
+            'Name': 'name',
+            'Values': [ami_name]
+        }],
+        Owners=['self']
+    )
 
     # If already exists a created AMI with ami_name name, it proceeds to deregister in order to create it again
-    if (result['Images']) and (result['Images'][0]['Name'] == ami_name):
-        print "\nAlready exists an AMI with '" + ami_name + "' name. This AMI will be deleted before create the new one..."
-        deregister_ami(result['Images'][0])
+    if (response['Images']) and (response['Images'][0]['Name'] == ami_name):
+        print("\nAlready exists an AMI with '" + ami_name + "' name. This AMI will be deleted before create the new one...")
+        deregister_ami(response['Images'][0])
 
-    print "\nCreation of '" + ami_name + "' AMI with",ami_description,"description from '" + instance_id + "' instance:"
+    print("\nCreation of '" + ami_name + "' AMI with '" + ami_description + "' description from '" + instance_id + "' instance:")
     if block_device_list_json is None:
         if arguments.reboot:
-            create_ami_command = shlex.split('aws ec2 create-image --instance-id ' + instance_id + ' --name ' + ami_name + ' --description ' + ami_description)
+            response = ec2.create_image(
+                InstanceId=instance_id,
+                Name=ami_name,
+                Description=ami_description
+            )
         else:
-            create_ami_command = shlex.split('aws ec2 create-image --instance-id ' + instance_id + ' --name ' + ami_name + ' --description ' + ami_description + ' --no-reboot')
+            response = ec2.create_image(
+                InstanceId=instance_id,
+                Name=ami_name,
+                Description=ami_description,
+                NoReboot=True
+            )
     else:
         if arguments.reboot:
-            create_ami_command = shlex.split('aws ec2 create-image --instance-id ' + instance_id + ' --name ' + ami_name + ' --description ' + ami_description + ' --block-device-mappings \'' + block_device_list_json + '\'')
+            response = ec2.create_image(
+                InstanceId=instance_id,
+                Name=ami_name,
+                Description=ami_description,
+                BlockDeviceMappings=block_device_list_json
+            )
         else:
-            create_ami_command = shlex.split('aws ec2 create-image --instance-id ' + instance_id + ' --name ' + ami_name + ' --description ' + ami_description + ' --block-device-mappings \'' + block_device_list_json + '\' --no-reboot')
-    output, error = subprocess.Popen(create_ami_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
-    print_result(output, error)
+            response = ec2.create_image(
+                InstanceId=instance_id,
+                Name=ami_name,
+                Description=ami_description,
+                BlockDeviceMappings=block_device_list_json,
+                NoReboot=True
+            )
+    print_response(response)
 
 # If the specified action is 'rotate', the following block is executed
 if (arguments.command == 'rotate'):
@@ -143,30 +175,34 @@ if (arguments.command == 'rotate'):
     rotation_copies = arguments.copies_number
 
     # Get the list of registered AMIs which name match the filter_name pattern
-    describe_ami_command = shlex.split('aws ec2 describe-images --owner self --filters Name=name,Values=' + filter_name)
-    output, error = subprocess.Popen(describe_ami_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
-
-    # Decoding of JSON response
-    try:
-        result = json.loads(output)
-    except ValueError as err:
-        print output
-        print err
-        exit(255)
+    response = ec2.describe_images(
+        Filters=[{
+            'Name': 'name',
+            'Values': [filter_name]
+        }],
+        Owners=['self']
+    )
 
     # Sort the AMIs list by the 'Name' attribute
-    sorted_images = sorted(result['Images'], key=itemgetter('Name'), reverse=True)
+    sorted_images = sorted(response['Images'], key=itemgetter('Name'), reverse=True)
 
-    print "\nAMIs currently registered:\n"
+    print("\nAMIs currently registered:\n")
     for ami in sorted_images:
-        print "\t" + ami['Name']
+        print("\t" + ami['Name'])
 
     if (len(sorted_images) > rotation_copies):
         if (len(sorted_images) - rotation_copies) == 1:
-            print "\nThere is",len(sorted_images) - rotation_copies,"AMI to deregister..."
+            print("\nThere is " + str(len(sorted_images) - rotation_copies) + " AMI to deregister...")
         else:
-            print "\nThere are",len(sorted_images) - rotation_copies,"AMIs to deregister..."
-        for i in xrange(rotation_copies, len(sorted_images)):
+            print("\nThere are " + str(len(sorted_images) - rotation_copies) + " AMIs to deregister...")
+
+        try:
+            # Python 2 forward compatibility
+            range = xrange
+        except NameError:
+            pass
+
+        for i in range(rotation_copies, len(sorted_images)):
             deregister_ami(sorted_images[i])
     else:
-        print "\nThe number of registered AMIs with '" + filter_name + "' name pattern is less or equal than the rotation copies number. No need to deregister any AMIs\n"
+        print("\nThe number of registered AMIs with '" + filter_name + "' name pattern is less or equal than the rotation copies number. No need to deregister any AMIs\n")
