@@ -3,7 +3,13 @@
 #
 # Modules Import
 #
-import argparse, boto3, json, os, requests, sys, time
+import argparse
+import boto3
+import json
+import os
+import requests
+import sys
+import time
 from operator import itemgetter
 
 #
@@ -116,7 +122,7 @@ if (arguments.command == 'create'):
     else:
         block_device_list_json = json.loads(arguments.block_device_list_json)
 
-    # Check if already exists any created AMI with ami_name name
+    # Check if there is already an AMI created with ami_name name
     response = ec2.describe_images(
         Filters=[{
             'Name': 'name',
@@ -125,9 +131,9 @@ if (arguments.command == 'create'):
         Owners=['self']
     )
 
-    # If already exists a created AMI with ami_name name, it proceeds to deregister in order to create it again
+    # If there is already an AMI created with ami_name name, it proceeds to deregister in order to create it again
     if (response['Images']) and (response['Images'][0]['Name'] == ami_name):
-        print("\nAlready exists an AMI with '" + ami_name + "' name. This AMI will be deleted before create the new one...")
+        print("\nAn AMI with '" + ami_name + "' name already exists. This AMI will be deleted before create the new one...")
         deregister_ami(response['Images'][0])
 
     print("\nCreation of '" + ami_name + "' AMI with '" + ami_description + "' description from '" + instance_id + "' instance:")
