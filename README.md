@@ -4,7 +4,7 @@ Tool to create and rotate EC2 AMIs and associated snapshots.
 
 ## Prerequisites
 
-* AWS IAM EC2 Role (only for executions from EC2 instances) or IAM User with the following associated IAM policy:
+* An IAM User or an AWS IAM Role attached to the EC2 instance (only for executions from EC2 instances) with the following IAM policy attached:
 
       Policy Name : EC2-ManageAMIs-<YYYYMMDD>
 
@@ -41,14 +41,14 @@ Tool to create and rotate EC2 AMIs and associated snapshots.
 
       $ sudo pip install requests
 
-* AWS CLI for ec2 commands (optional). Installation and configuration:
+* AWS CLI to configure the profile to use (access key and/or region). Installation and configuration:
 
       $ sudo pip install awscli
 
-      $ aws configure
-      AWS Access Key ID [None]: <access_key>		# Leave blank in EC2 instances with associated IAM Role
-      AWS Secret Access Key [None]: <secret_key>	# Leave blank in EC2 instances with associated IAM Role
-      Default region name [None]: eu-west-1
+      $ aws configure [--profile <profile-name>]
+      AWS Access Key ID [None]: <access_key_id>         # Leave blank in EC2 instances with associated IAM Role
+      AWS Secret Access Key [None]: <secret_access_key> # Leave blank in EC2 instances with associated IAM Role
+      Default region name [None]: <region>              # eu-west-1, eu-central-1, us-east-1, ...
       Default output format [None]:
 
 ## Configuration
