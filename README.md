@@ -132,5 +132,7 @@ Here you have the message that you will get if you request help to the `ec2_ami.
 
 ## Related Links
 
-* [Installing the AWS CLI Using pip](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html#install-tool-pip)
+* [AWS SDK for Python (Boto3)](https://aws.amazon.com/sdk-for-python/)
+* [EC2 - Boto 3 Docs](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2.html)
+* [Installing the AWS CLI Using pip](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv1.html#install-tool-pip)
 * [Configuring the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html)

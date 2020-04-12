@@ -21,20 +21,80 @@ instance_id_metadata_url = 'http://169.254.169.254/latest/meta-data/instance-id'
 # Function to parse the input arguments and build the help message
 #
 def arguments_parser():
-    parser = argparse.ArgumentParser(description='Tool to create and rotate EC2 AMIs and associated snapshots', add_help=True)
+    parser = argparse.ArgumentParser(
+        description='Tool to create and rotate EC2 AMIs and associated snapshots',
+        add_help=True
+    )
 
     options = parser.add_argument_group('Options')
-    options.add_argument('-n', '--name', type=str, action='store', dest='ami_name', required=True, help='Name for the AMI to create or rotate')
-    options.add_argument('-t', '--time', action='store_true', dest='time', help='Add the time to the name format: AMI_NAME-AAAA_MM_DD-HH_MM (default: AMI_NAME-AAAA_MM_DD)')
-    options.add_argument('-d', '--description', type=str, action='store', dest='ami_description', default='TBD', help='Description for the AMI to create (default: AMI_NAME AMI created by ' + os.path.basename(sys.argv[0]) + ')')
-    options.add_argument('-i', '--instance-id', type=str, action='store', dest='instance_id', default='TBD', help='Instance ID from which create the AMI (default: Self Instance ID)')
-    options.add_argument('-r', '--reboot', action='store_true', dest='reboot', help='Reboot the instance to create the AMI (default: No reboot)')
-    options.add_argument('-b', '--block-device-mappings', type=str, action='store', dest='block_device_list_json', default='TBD', help='JSON format list of one or more block device mappings to include in the AMI (default: Include all block device mappings attached to the instance)')
-    options.add_argument('-c', '--rotation-copies', type=int, action='store', dest='copies_number', default=10, help='Number of copies for rotation (default: 10)')
-    options.add_argument('-p', '--profile', type=str, action='store', dest='profile', default='default', help='Use a specific profile from AWS CLI stored configurations')
+    options.add_argument(
+        '-n', '--name',
+        type=str,
+        action='store',
+        dest='ami_name',
+        required=True,
+        help='Name for the AMI to create or rotate'
+    )
+    options.add_argument(
+        '-t', '--time',
+        action='store_true',
+        dest='time',
+        help='Add the time to the name format: AMI_NAME-AAAA_MM_DD-HH_MM (default: AMI_NAME-AAAA_MM_DD)'
+    )
+    options.add_argument(
+        '-d', '--description',
+        type=str,
+        action='store',
+        dest='ami_description',
+        default='TBD',
+        help='Description for the AMI to create (default: AMI_NAME AMI created by ' + os.path.basename(sys.argv[0]) + ')'
+    )
+    options.add_argument(
+        '-i', '--instance-id',
+        type=str,
+        action='store',
+        dest='instance_id',
+        default='TBD',
+        help='Instance ID from which create the AMI (default: Self Instance ID)'
+    )
+    options.add_argument(
+        '-r', '--reboot',
+        action='store_true',
+        dest='reboot',
+        help='Reboot the instance to create the AMI (default: No reboot)'
+    )
+    options.add_argument(
+        '-b', '--block-device-mappings',
+        type=str,
+        action='store',
+        dest='block_device_list_json',
+        default='TBD',
+        help='JSON format list of one or more block device mappings to include in the AMI (default: Include all block device mappings attached to the instance)'
+    )
+    options.add_argument(
+        '-c', '--rotation-copies',
+        type=int,
+        action='store',
+        dest='copies_number',
+        default=10,
+        help='Number of copies for rotation (default: 10)'
+    )
+    options.add_argument(
+        '-p', '--profile',
+        type=str,
+        action='store',
+        dest='profile',
+        default='default',
+        help='Use a specific profile from AWS CLI stored configurations'
+    )
 
     commands = parser.add_argument_group('Actions')
-    commands.add_argument('command', type=str, choices=['create', 'rotate'], help='Command to be exectuted')
+    commands.add_argument(
+        'command',
+        type=str,
+        choices=['create', 'rotate'],
+        help='Command to be exectuted'
+    )
 
     args = parser.parse_args()
     return args
@@ -43,7 +103,13 @@ def arguments_parser():
 # Function to print the boto3 responses in JSON format
 #
 def print_response(response):
-    print(json.dumps(response, default=str, sort_keys=True, indent=4, separators=(',', ': ')))
+    print(json.dumps(
+        response,
+        default=str,
+        sort_keys=True,
+        indent=4,
+        separators=(',', ': ')
+    ))
 
 #
 # Function to create a session of boto3 to interact with the AWS account
