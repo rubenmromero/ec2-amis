@@ -103,13 +103,13 @@ def arguments_parser():
 # Function to print the boto3 responses in JSON format
 #
 def print_response(response):
-    print(json.dumps(
+    return json.dumps(
         response,
         default=str,
         sort_keys=True,
         indent=4,
         separators=(',', ': ')
-    ))
+    )
 
 #
 # Function to create a session of boto3 to interact with the AWS account
