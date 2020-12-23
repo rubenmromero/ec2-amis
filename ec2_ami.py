@@ -102,7 +102,7 @@ def arguments_parser():
 #
 # Function to print the boto3 responses in JSON format
 #
-def print_response(response):
+def json_response(response):
     return json.dumps(
         response,
         default=str,
@@ -138,7 +138,7 @@ def deregister_ami(ami_info):
     image_id = str(ami_info['ImageId'])
     print("\nDeregister '" + image_id + "' AMI with '" + ami_info['Name'] + "' name:")
     response = ec2.deregister_image(ImageId=image_id)
-    print_response(response)
+    print(json_response(response))
 
     # Delete the associated snapshots
     for device in ami_info['BlockDeviceMappings']:
@@ -147,7 +147,7 @@ def deregister_ami(ami_info):
             snapshot_id = str(device['Ebs']['SnapshotId'])
             print("\nDelete '" + snapshot_id + "' associated snapshot:")
             response = ec2.delete_snapshot(SnapshotId=snapshot_id)
-            print_response(response)
+            print(json_response(response))
 
 #
 # Main
@@ -233,7 +233,7 @@ if (arguments.command == 'create'):
                 BlockDeviceMappings=block_device_list_json,
                 NoReboot=True
             )
-    print_response(response)
+    print(json_response(response))
 
 # If the specified action is 'rotate', the following block is executed
 if (arguments.command == 'rotate'):
