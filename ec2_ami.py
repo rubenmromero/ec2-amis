@@ -93,7 +93,7 @@ def arguments_parser():
         'command',
         type=str,
         choices=['create', 'rotate'],
-        help='Command to be exectuted'
+        help='Command to execute'
     )
 
     args = parser.parse_args()
@@ -136,7 +136,7 @@ def create_session():
 def deregister_ami(ami_info):
     # Deregister the AMI
     image_id = str(ami_info['ImageId'])
-    print("\nIt proceeds to deregister '" + image_id + "' AMI with '" + ami_info['Name'] + "' name:")
+    print("\nDeregister '" + image_id + "' AMI with '" + ami_info['Name'] + "' name:")
     response = ec2.deregister_image(ImageId=image_id)
     print_response(response)
 
@@ -145,7 +145,7 @@ def deregister_ami(ami_info):
         # If device is an EBS volume, it proceeds to delete the associated snapshot
         if 'Ebs' in device:
             snapshot_id = str(device['Ebs']['SnapshotId'])
-            print("\nIt proceeds to delete '" + snapshot_id + "' associated snapshot:")
+            print("\nDelete '" + snapshot_id + "' associated snapshot:")
             response = ec2.delete_snapshot(SnapshotId=snapshot_id)
             print_response(response)
 
@@ -199,10 +199,10 @@ if (arguments.command == 'create'):
 
     # If there is already an AMI created with ami_name name, it proceeds to deregister in order to create it again
     if (response['Images']) and (response['Images'][0]['Name'] == ami_name):
-        print("\nAn AMI with '" + ami_name + "' name already exists. This AMI will be deleted before create the new one...")
+        print("\nAn AMI with '" + ami_name + "' name already exists. This AMI will be deregistered before creating the new one...")
         deregister_ami(response['Images'][0])
 
-    print("\nCreation of '" + ami_name + "' AMI with '" + ami_description + "' description from '" + instance_id + "' instance:")
+    print("\nCreate '" + ami_name + "' AMI with '" + ami_description + "' description from '" + instance_id + "' instance:")
     if block_device_list_json is None:
         if arguments.reboot:
             response = ec2.create_image(

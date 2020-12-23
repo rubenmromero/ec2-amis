@@ -102,7 +102,7 @@ Here you have the message that you will get if you request help to the `ec2_ami.
                             configurations
 
     Actions:
-      {create,rotate}       Command to be exectuted
+      {create,rotate}       Command to execute
 
 ## Execution Examples
 
